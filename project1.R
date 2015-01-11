@@ -1,23 +1,6 @@
----
-title: "Reproducible Research Peer Assessment 1"
-author: "SC"
-date: "Sunday, January 11, 2015"
-output: html_document
----
-
-This assignment makes use of data from a personal activity monitoring device. This device collects data at 5 minute intervals through out the day. The data consists of two months of data from an anonymous individual collected during the months of October and November, 2012 and include the number of steps taken in 5 minute intervals each day.
-
-The variables included in this dataset are:
-1. steps: Number of steps taking in a 5-minute interval (missing values are coded as NA)
-2. date: The date on which the measurement was taken in YYYY-MM-DD format
-3. interval: Identifier for the 5-minute interval in which measurement was taken
-The dataset is stored in a comma-separated-value (CSV) file and there are a total of 17,568 observations in this dataset.
-
-##Loading and preprocessing the data
-
-```{r load_and_preprocess}
-
+repro1 <- function(){
     library(fields)
+    
     # load data
     file <- read.csv("activity.csv")
     
@@ -25,12 +8,7 @@ The dataset is stored in a comma-separated-value (CSV) file and there are a tota
     file$steps <- as.numeric(as.character(file$steps))
     file$date <- as.Date(as.character(file$date))
     file$interval <- as.integer(as.character(file$interval))
-
-```
-
-
-##What is mean total number of steps taken per day?
-```{r plot_1}
+    
     # select rows without NA
     valid <-na.omit(file)
     
@@ -41,14 +19,9 @@ The dataset is stored in a comma-separated-value (CSV) file and there are a tota
     hist(by_date$steps, breaks=8, main = "Histogram of the total number of steps taken each day", xlab = "Steps")
     
     # mean and median total number of steps taken each day
-    cat("Mean:")
     mean(by_date$steps)
-    cat("Median:")
     median(by_date$steps)
-```
-
-##What is the average daily activity pattern? 
-```{r plot_2}
+    
     # group records by interval
     by_interval <- aggregate(steps ~ interval, data=valid, FUN = mean)
     
@@ -59,9 +32,6 @@ The dataset is stored in a comma-separated-value (CSV) file and there are a tota
     cat("Maximum number of steps:")
     by_interval$interval[by_interval$steps == max(by_interval$steps)]
     
-```
-##Imputing missing values
-```{r plot_3}
     #check where NA is
     sum(is.na(file$steps))
     sum(is.na(file$date))
@@ -91,18 +61,11 @@ The dataset is stored in a comma-separated-value (CSV) file and there are a tota
     hist(by_date_r$steps, breaks=8, main = "Histogram of the total number of steps taken each day", xlab="Steps")
     
     #mean and median
-    cat("Mean:")
     mean(by_date_r$steps)
-    cat("Median:")
     median(by_date_r$steps)
-   
+    #conclusion: no change from original data because the mean is used
     
-```
-**Conclusion: no big change from original data because the mean is used.**
-
-##Are there differences in activity patterns between weekdays and weekends?
-```{r plot_4}
-    #create a new column of weekday by converting date into day of the week
+    #convert date into day of the week
     recombine$weekday <- weekdays(recombine$date)
     
     #convert date of the week into either weekday or weekend
@@ -115,8 +78,8 @@ The dataset is stored in a comma-separated-value (CSV) file and there are a tota
     recombine$weekday[recombine$weekday == "Sunday"] <- "weekend"
     
     # group records by weekday and weekend
-    weekend <- recombine[which(recombine$weekday == "weekend"),]
     weekday <- recombine[which(recombine$weekday == "weekday"),]
+    weekend <- recombine[which(recombine$weekday == "weekend"),]
     
     # group records by interval
     weekend_interval <- aggregate(steps ~ interval, data=weekend, FUN = mean)
@@ -126,9 +89,6 @@ The dataset is stored in a comma-separated-value (CSV) file and there are a tota
     set.panel(2,1)
     plot(weekend_interval$steps ~weekend_interval$interval, type="l", xlab = "Interval", ylab = "Number of steps", main="Weekend")
     plot(weekday_interval$steps ~weekday_interval$interval, type="l", xlab = "Interval", ylab = "Number of steps", main ="Weekday")
-   
-
+    #conclusion: the subject walks more over the weekend. The subject's job during the weekdays is sedentary. 
     
-```
-
-**Conclusion: the subject walks more over the weekend. The subject's day activities during the weekdays are sedentary.** 
+}

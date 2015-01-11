@@ -15,8 +15,8 @@ The dataset is stored in a comma-separated-value (CSV) file and there are a tota
 
 ##Loading and preprocessing the data
 
-```{r load_and_preprocess}
 
+```r
     library(fields)
     # load data
     file <- read.csv("activity.csv")
@@ -25,12 +25,12 @@ The dataset is stored in a comma-separated-value (CSV) file and there are a tota
     file$steps <- as.numeric(as.character(file$steps))
     file$date <- as.Date(as.character(file$date))
     file$interval <- as.integer(as.character(file$interval))
-
 ```
 
 
 ##What is mean total number of steps taken per day?
-```{r plot_1}
+
+```r
     # select rows without NA
     valid <-na.omit(file)
     
@@ -39,33 +39,99 @@ The dataset is stored in a comma-separated-value (CSV) file and there are a tota
     
     #histogram
     hist(by_date$steps, breaks=8, main = "Histogram of the total number of steps taken each day", xlab = "Steps")
-    
+```
+
+![plot of chunk plot_1](figure/plot_1-1.png) 
+
+```r
     # mean and median total number of steps taken each day
     cat("Mean:")
+```
+
+```
+## Mean:
+```
+
+```r
     mean(by_date$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
     cat("Median:")
+```
+
+```
+## Median:
+```
+
+```r
     median(by_date$steps)
 ```
 
+```
+## [1] 10765
+```
+
 ##What is the average daily activity pattern? 
-```{r plot_2}
+
+```r
     # group records by interval
     by_interval <- aggregate(steps ~ interval, data=valid, FUN = mean)
     
     #plot a time series plot
     plot(by_interval, type="l")
-    
+```
+
+![plot of chunk plot_2](figure/plot_2-1.png) 
+
+```r
     # find interval with maximum number of steps
     cat("Maximum number of steps:")
+```
+
+```
+## Maximum number of steps:
+```
+
+```r
     by_interval$interval[by_interval$steps == max(by_interval$steps)]
-    
+```
+
+```
+## [1] 835
 ```
 ##Imputing missing values
-```{r plot_3}
+
+```r
     #check where NA is
     sum(is.na(file$steps))
+```
+
+```
+## [1] 2304
+```
+
+```r
     sum(is.na(file$date))
+```
+
+```
+## [1] 0
+```
+
+```r
     sum(is.na(file$interval))
+```
+
+```
+## [1] 0
+```
+
+```r
     #conclusion: only steps has NA
     
     #select all records with NA
@@ -73,8 +139,21 @@ The dataset is stored in a comma-separated-value (CSV) file and there are a tota
     
     #number of NA rows
     cat("Total number of missing values:")
+```
+
+```
+## Total number of missing values:
+```
+
+```r
     dim(isNA)[1]
-    
+```
+
+```
+## [1] 2304
+```
+
+```r
     #replace NA with average steps across all days of the corresponding interval
     interval <- by_interval[,1]
     for (i in interval){
@@ -89,19 +168,47 @@ The dataset is stored in a comma-separated-value (CSV) file and there are a tota
     
     #create histogram
     hist(by_date_r$steps, breaks=8, main = "Histogram of the total number of steps taken each day", xlab="Steps")
-    
+```
+
+![plot of chunk plot_3](figure/plot_3-1.png) 
+
+```r
     #mean and median
     cat("Mean:")
+```
+
+```
+## Mean:
+```
+
+```r
     mean(by_date_r$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
     cat("Median:")
+```
+
+```
+## Median:
+```
+
+```r
     median(by_date_r$steps)
-   
-    
+```
+
+```
+## [1] 10766.19
 ```
 **Conclusion: no big change from original data because the mean is used.**
 
 ##Are there differences in activity patterns between weekdays and weekends?
-```{r plot_4}
+
+```r
     #create a new column of weekday by converting date into day of the week
     recombine$weekday <- weekdays(recombine$date)
     
@@ -124,11 +231,17 @@ The dataset is stored in a comma-separated-value (CSV) file and there are a tota
     
     #create panel plots
     set.panel(2,1)
+```
+
+```
+## plot window will lay out plots in a 2 by 1 matrix
+```
+
+```r
     plot(weekend_interval$steps ~weekend_interval$interval, type="l", xlab = "Interval", ylab = "Number of steps", main="Weekend")
     plot(weekday_interval$steps ~weekday_interval$interval, type="l", xlab = "Interval", ylab = "Number of steps", main ="Weekday")
-   
-
-    
 ```
+
+![plot of chunk plot_4](figure/plot_4-1.png) 
 
 **Conclusion: the subject walks more over the weekend. The subject's day activities during the weekdays are sedentary.** 
